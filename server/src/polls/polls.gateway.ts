@@ -36,7 +36,7 @@ export class PollsGateway
     this.logger.log(`Websocket Gateway initialized.`);
   }
 
-  handleConnection(client: SocketWithAuth) {
+  async handleConnection(client: SocketWithAuth) {
     const sockets = this.io.sockets;
 
     this.logger.debug(
@@ -46,20 +46,48 @@ export class PollsGateway
     this.logger.log(`WS Client with id: ${client.id} connected!`);
     this.logger.debug(`Number of connected sockets: ${sockets.size}`);
 
-    this.io.emit('hello', `from ${client.id}`);
-  }
+    const roomName = client.pollId;
+    await client.join(roomName);
 
-  handleDisconnect(client: SocketWithAuth) {
-    const sockets = this.io.sockets;
+    const connectedClients = this.io.adapter.rooms?.get(roomName)?.size ?? 0;
 
     this.logger.debug(
-      `Socket disconnected with userId: ${client.userId}, pollId: ${client.pollId}, and username: "${client.username}"`,
+      `userId: ${client.userId} joined room with name: ${roomName}`,
     );
+    this.logger.debug(
+      `Total clients connected to room '${roomName}': ${connectedClients}`,
+    );
+
+    const updatedPoll = await this.pollsService.addParticipant({
+      pollId: client.pollId,
+      userId: client.userId,
+      username: client.username,
+    });
+
+    this.io.to(roomName).emit('poll_updated', updatedPoll);
+  }
+
+  async handleDisconnect(client: SocketWithAuth) {
+    const sockets = this.io.sockets;
+
+    const { pollId, userId } = client;
+    const updatedPoll = await this.pollsService.removeParticipant(
+      pollId,
+      userId,
+    );
+
+    const roomName = client.pollId;
+    const clientCount = this.io.adapter.rooms?.get(roomName)?.size ?? 0;
 
     this.logger.log(`Disconnected socket id: ${client.id}`);
     this.logger.debug(`Number of connected sockets: ${sockets.size}`);
+    this.logger.debug(
+      `Total clients connected to room '${roomName}': ${clientCount}`,
+    );
 
-    // TODO: remove client from poll and send `participants_updated` event to remaining clients
+    if (updatedPoll) {
+      this.io.to(pollId).emit('poll_updated', updatedPoll);
+    }
   }
 
   @SubscribeMessage('test')
