@@ -106,4 +106,8 @@ export class PollsService {
       return updatedPoll;
     }
   }
+
+  async getPoll(pollId: string): Promise<Poll> {
+    return this.pollsRepository.getPoll(pollId);
+  }
 }
