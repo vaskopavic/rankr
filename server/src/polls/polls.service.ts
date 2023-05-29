@@ -3,8 +3,9 @@ import { JwtService } from '@nestjs/jwt/dist';
 
 import { Poll } from 'shared/poll-types';
 import { PollsRepository } from './polls.repository';
-import { createPollId, createUserId } from 'src/utils/ids';
+import { createPollId, createUserId, createNominationId } from 'src/utils/ids';
 import {
+  AddNominationFields,
   AddParticipantFields,
   CreatePollFields,
   JoinPollFields,
@@ -109,5 +110,24 @@ export class PollsService {
 
   async getPoll(pollId: string): Promise<Poll> {
     return this.pollsRepository.getPoll(pollId);
+  }
+
+  async addNomination({
+    pollId,
+    userId,
+    text,
+  }: AddNominationFields): Promise<Poll> {
+    return this.pollsRepository.addNomination({
+      pollId,
+      nominationId: createNominationId(),
+      nomination: {
+        userId,
+        text,
+      },
+    });
+  }
+
+  async removeNomination(pollId: string, nominationId: string): Promise<Poll> {
+    return this.pollsRepository.removeNomination(pollId, nominationId);
   }
 }
