@@ -4,7 +4,12 @@ import { ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
 
 import { IORedisKey } from 'src/redis.module';
-import { AddNominationData, AddParticipantData, CreatePollData } from './types';
+import {
+  AddNominationData,
+  AddParticipantData,
+  AddParticipantRankingsData,
+  CreatePollData,
+} from './types';
 import { Poll } from 'shared';
 
 @Injectable()
@@ -30,6 +35,7 @@ export class PollsRepository {
       votesPerUser,
       participants: {},
       nominations: {},
+      rankings: {},
       adminId: userId,
       hasStarted: false,
     };
@@ -181,6 +187,61 @@ export class PollsRepository {
 
       throw new InternalServerErrorException(
         `Failed to remove nominationId: ${nominationId} from poll: ${pollId}`,
+      );
+    }
+  }
+
+  async startPoll(pollId: string): Promise<Poll> {
+    this.logger.log(`setting hasStarted for poll: ${pollId}`);
+
+    const key = `polls:${pollId}`;
+
+    try {
+      await this.redisClient.send_command(
+        'JSON.SET',
+        key,
+        '.hasStarted',
+        JSON.stringify(true),
+      );
+
+      return this.getPoll(pollId);
+    } catch (error) {
+      this.logger.error(`Failed set hasStarted for poll: ${pollId}`, error);
+      throw new InternalServerErrorException(
+        'The was an error starting the poll',
+      );
+    }
+  }
+
+  async addParticipantRankings({
+    pollId,
+    userId,
+    rankings,
+  }: AddParticipantRankingsData): Promise<Poll> {
+    this.logger.log(
+      `Attempting to add rankings for userId: ${userId} to pollId: ${pollId}`,
+      rankings,
+    );
+
+    const key = `polls:${pollId}`;
+    const rankingsPath = `.rankings.${userId}`;
+
+    try {
+      await this.redisClient.send_command(
+        'JSON.SET',
+        key,
+        rankingsPath,
+        JSON.stringify(rankings),
+      );
+
+      return this.getPoll(pollId);
+    } catch (error) {
+      this.logger.error(
+        `Failed to add a rankings for userId: ${userId} to pollId: ${pollId}`,
+        rankings,
+      );
+      throw new InternalServerErrorException(
+        'There was an error starting the poll',
       );
     }
   }
