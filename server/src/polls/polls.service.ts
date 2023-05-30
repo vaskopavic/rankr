@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt/dist';
 
+import getResults from './getResults';
 import { Poll } from 'shared/poll-types';
 import { PollsRepository } from './polls.repository';
 import { createPollId, createUserId, createNominationId } from 'src/utils/ids';
@@ -146,5 +147,21 @@ export class PollsService {
     }
 
     return this.pollsRepository.addParticipantRankings(rankingsData);
+  }
+
+  async computeResults(pollId: string): Promise<Poll> {
+    const poll = await this.pollsRepository.getPoll(pollId);
+
+    const results = getResults(
+      poll.rankings,
+      poll.nominations,
+      poll.votesPerUser,
+    );
+
+    return this.pollsRepository.addResults(pollId, results);
+  }
+
+  async cancelPoll(pollId: string): Promise<void> {
+    await this.pollsRepository.deletePoll(pollId);
   }
 }
