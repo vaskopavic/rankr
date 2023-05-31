@@ -17,8 +17,8 @@ type TokenPayload = {
   iat: number;
   exp: number;
   sub: string;
-  name: string;
-  pollID: string;
+  username: string;
+  pollId: string;
 };
 
 export const getTokenPayload = (accessToken: string): TokenPayload =>

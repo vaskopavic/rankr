@@ -13,28 +13,28 @@ export default {
     onRemoveNomination: { action: 'removing nomination' },
   },
   args: {
-    userID: '1',
+    userId: '1',
     isAdmin: false,
   },
 } as ComponentMeta<typeof NominationForm>;
 
 const nominations: Nominations = {
   item1: {
-    userID: '1',
+    userId: '1',
     text: 'Nominanationaroo 1',
   },
   item2: {
-    userID: '2',
+    userId: '2',
     text: 'Nominanationaroo 2',
   },
   item3: {
-    userID: '3',
+    userId: '3',
     text: 'Nominanationaroo 3',
   },
 };
 
 const Template: ComponentStory<typeof NominationForm> = (args) => (
-  <div className="max-w-sm m-auto h-screen relative">
+  <div className="relative h-screen max-w-sm m-auto">
     <NominationForm {...args} />
   </div>
 );

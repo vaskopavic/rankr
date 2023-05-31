@@ -26,7 +26,7 @@ const participants: Participants = {
 };
 
 const Template: ComponentStory<typeof ParticipantList> = (args) => (
-  <div className="max-w-sm m-auto h-screen relative">
+  <div className="relative h-screen max-w-sm m-auto">
     <ParticipantList {...args} />
   </div>
 );
@@ -34,5 +34,5 @@ const Template: ComponentStory<typeof ParticipantList> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   participants,
-  userID: '1',
+  userId: '1',
 };
