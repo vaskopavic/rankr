@@ -1,6 +1,8 @@
 import { proxy } from 'valtio';
+import { derive, subscribeKey } from 'valtio/utils';
 
 import { Poll } from 'shared/poll-types';
+import { getTokenPayload } from './util';
 
 export enum AppPage {
   Welcome = 'welcome',
@@ -9,8 +11,14 @@ export enum AppPage {
   WaitingRoom = 'waiting-room',
 }
 
+type Me = {
+  id: string;
+  username: string;
+};
+
 export type AppState = {
   isLoading: boolean;
+  me?: Me;
   currentPage: AppPage;
   poll?: Poll;
   accessToken?: string;
@@ -20,6 +28,34 @@ const state: AppState = proxy({
   isLoading: false,
   currentPage: AppPage.Welcome,
 });
+
+const stateWithComputed: AppState = derive(
+  {
+    me: (get) => {
+      const accessToken = get(state).accessToken;
+
+      if (!accessToken) {
+        return;
+      }
+
+      const token = getTokenPayload(accessToken);
+
+      return {
+        id: token.sub,
+        name: token.username,
+      };
+    },
+    isAdmin: (get) => {
+      if (!get(state).me) {
+        return false;
+      }
+      return get(state).me?.id === get(state).poll?.adminId;
+    },
+  },
+  {
+    proxy: state,
+  }
+);
 
 const actions = {
   setPage: (page: AppPage): void => {
@@ -42,4 +78,12 @@ const actions = {
   },
 };
 
-export { state, actions };
+subscribeKey(state, 'accessToken', () => {
+  if (state.accessToken && state.poll) {
+    localStorage.setItem('accessToken', state.accessToken);
+  } else {
+    localStorage.removeItem('accessToken');
+  }
+});
+
+export { stateWithComputed as state, actions };
