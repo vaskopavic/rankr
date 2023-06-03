@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import { useSnapshot } from 'valtio';
 
+import Welcome from './pages/Welcome';
 import Create from './pages/Create';
 import Join from './pages/Join';
-import Welcome from './pages/Welcome';
 import { WaitingRoom } from './pages/WaitingRoom';
+import { Voting } from './pages/Voting';
 import { AppPage, actions, state } from './state';
 
 const routeConfig = {
@@ -13,6 +14,7 @@ const routeConfig = {
   [AppPage.Create]: Create,
   [AppPage.Join]: Join,
   [AppPage.WaitingRoom]: WaitingRoom,
+  [AppPage.Voting]: Voting,
 };
 
 const Pages: React.FC = () => {
@@ -25,6 +27,10 @@ const Pages: React.FC = () => {
       !currentState.poll?.hasStarted
     ) {
       actions.setPage(AppPage.WaitingRoom);
+    }
+
+    if (currentState.me?.id && currentState.poll?.hasStarted) {
+      actions.setPage(AppPage.Voting);
     }
   }, [currentState.me?.id, currentState.poll?.hasStarted]);
 

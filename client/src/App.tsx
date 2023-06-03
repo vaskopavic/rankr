@@ -9,7 +9,7 @@ import { getTokenPayload } from './util';
 import Loader from './components/ui/Loader';
 import SnackBar from './components/ui/SnackBar';
 
-devtools(state, 'app state');
+devtools(state, { name: 'app state' });
 const App: React.FC = () => {
   const currentState = useSnapshot(state);
 
@@ -37,6 +37,19 @@ const App: React.FC = () => {
     actions.setPollAccessToken(accessToken);
     actions.initializeSocket();
   }, []);
+
+  useEffect(() => {
+    console.log('App useEffect - check current participant');
+    const myId = currentState.me?.id;
+
+    if (
+      myId &&
+      currentState.socket?.connected &&
+      !currentState.poll?.participants[myId]
+    ) {
+      actions.startOver();
+    }
+  }, [currentState.poll?.participants]);
 
   return (
     <>
