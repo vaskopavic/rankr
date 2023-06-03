@@ -13,6 +13,7 @@ export enum AppPage {
   Join = 'join',
   WaitingRoom = 'waiting-room',
   Voting = 'voting',
+  Results = 'results',
 }
 
 type Me = {
@@ -41,6 +42,8 @@ export type AppState = {
   nominationCount: number;
   participantCount: number;
   canStartVote: boolean;
+  hasVoted: boolean;
+  rankingsCount: number;
 };
 
 const state = proxy<AppState>({
@@ -77,6 +80,15 @@ const state = proxy<AppState>({
     const votesPerUser = this.poll?.votesPerUser ?? 100;
 
     return this.nominationCount >= votesPerUser;
+  },
+  get hasVoted() {
+    const rankings = this.poll?.rankings || {};
+    const userId = this.me?.id || '';
+
+    return rankings[userId] !== undefined ? true : false;
+  },
+  get rankingsCount() {
+    return Object.keys(this.poll?.rankings || {}).length;
   },
 });
 
@@ -119,6 +131,9 @@ const actions = {
   },
   nominate: (text: string): void => {
     state.socket?.emit('nominate', { text });
+  },
+  closePoll: (): void => {
+    state.socket?.emit('close_poll');
   },
   startOver: (): void => {
     actions.reset();

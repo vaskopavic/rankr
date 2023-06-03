@@ -2,7 +2,7 @@ import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import ResultCard from '../components/ui/ResultCard';
-import { RoundResult } from 'shared/poll-types';
+import { Results } from 'shared/poll-types';
 
 export default {
   title: 'ResultCard',
@@ -15,114 +15,45 @@ const Template: ComponentStory<typeof ResultCard> = (args) => (
   </div>
 );
 
-const result: RoundResult = {
-  votes: [
-    {
-      nominationId: '1',
-      count: 3,
-      text: 'Taco Bell',
-    },
-    {
-      nominationId: '2',
-      count: 2,
-      text: 'Del Taco',
-    },
-    {
-      nominationId: '3',
-      count: 1,
-      text: "Papa's Tacos",
-    },
-    {
-      nominationId: '4',
-      count: 1,
-      text: 'Los Taqueros Locos con Nomre Largo',
-    },
-  ],
-  totalVotes: 7,
-};
-
-export const ResultCardShort = Template.bind({});
-ResultCardShort.args = {
-  result,
-};
-
-const resultLong = {
-  votes: [
-    {
-      nominationId: '1',
-      count: 10,
-      text: 'Taco Bell',
-    },
-    {
-      nominationId: '2',
-      count: 8,
-      text: 'Del Taco',
-    },
-    {
-      nominationId: '3',
-      count: 5,
-      text: "Papa's Tacos",
-    },
-    {
-      nominationId: '4',
-      count: 4,
-      text: 'Los Taqueros Locos con Nomre Largo',
-    },
-    {
-      nominationId: '5',
-      count: 4,
-      text: 'Chicky-Chicken-Filet',
-    },
-    {
-      nominationId: '6',
-      count: 3,
-      text: 'Mad Clown Burger',
-    },
-    {
-      nominationId: '7',
-      count: 3,
-      text: 'Thai Basil #0005',
-    },
-    {
-      nominationId: '8',
-      count: 2,
-      text: 'Sichuan Spice',
-    },
-    {
-      nominationId: '9',
-      count: 0,
-      text: 'Not Good Curry',
-    },
-    {
-      nominationId: '10',
-      count: 0,
-      text: 'Not Good Soul Food',
-    },
-    {
-      nominationId: '11',
-      count: 0,
-      text: 'Not Good Sushi',
-    },
-    {
-      nominationId: '12',
-      count: 0,
-      text: 'Not Good Falafel',
-    },
-    {
-      nominationId: '13',
-      count: 0,
-      text: 'Not Good Steakhouse',
-    },
-    {
-      nominationId: '14',
-      count: 0,
-      text: 'Not Good Burgers',
-    },
-  ],
-  totalVotes: 39,
-};
+const results: Results = [
+  {
+    nominationId: '1',
+    score: 5.0,
+    nominationText: 'Taco Bell',
+  },
+  {
+    nominationId: '2',
+    score: 2.56,
+    nominationText: 'Del Taco',
+  },
+  {
+    nominationId: '3',
+    score: 2.4,
+    nominationText: "Papa's Tacos",
+  },
+  {
+    nominationId: '4',
+    score: 1.55,
+    nominationText: 'Los Taqueros Locos con Nombre Largo',
+  },
+  {
+    nominationId: '5',
+    score: 1.41,
+    nominationText: 'El Vilsito',
+  },
+  {
+    nominationId: '6',
+    score: 1.11,
+    nominationText: 'Tacos El Güero',
+  },
+  {
+    nominationId: '7',
+    score: 0.0,
+    nominationText: 'Taqueria del Mercado',
+  },
+];
 
 export const ResultCardLong = Template.bind({});
 ResultCardLong.args = {
-  result: resultLong,
+  results,
 };
